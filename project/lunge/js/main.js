@@ -10,7 +10,6 @@ let count = 0; // 카운트
 let lastAction = "stand"; // 마지막으로 했던 동작 (lunge, stand, nothing)
 let startFlag = false; // 카운트 다운 시작 여부
 
-const clock = document.getElementById("clock");
 const labelContainer = document.getElementById("label-container");
 const countContainer = document.getElementById("count-container");
 const logContainer = document.getElementById("log-container");
@@ -29,39 +28,49 @@ function isMobile() {
 
 // 카메라 존재 여부 확인
 function checkCamera() {
-  navigator.mediaDevices.getUserMedia({ video: true }).catch(function (error) {
-    console.log(error);
+  navigator.mediaDevices
+    .getUserMedia({
+      video: true,
+    })
+    .catch(function (error) {
+      console.log(error);
 
-    if (error.name == "NotAllowedError") {
-      alert("카메라 사용 권한을 허용해주세요.");
-    } else if (error.name == "NotFoundError") {
-      alert("카메라를 찾을 수 없습니다.");
-    } else {
-      alert("카메라 관련 알 수 없는 에러가 발생했습니다.");
-    }
+      if (error.name == "NotAllowedError") {
+        alert("카메라 사용 권한을 허용해주세요.");
+      } else if (error.name == "NotFoundError") {
+        alert("카메라를 찾을 수 없습니다.");
+      } else {
+        alert("카메라 관련 알 수 없는 에러가 발생했습니다.");
+      }
 
-    haveCamera = false;
-  });
+      haveCamera = false;
+    });
 }
 
 // 카운트 다운 시작
 function start() {
+  const clock = document.getElementById("clock");
+  const span = document.querySelector("#clock span");
   if (haveCamera) {
     let count = 3;
 
-    clock.innerHTML = count;
+    clock.style.display = "block";
+
+    span.innerHTML = `${count} 초 후 시작`;
 
     const timer = setInterval(() => {
       count--;
 
       if (count == 0) {
-        clock.innerHTML = "START";
         startFlag = true;
+        span.innerHTML = "시작";
       } else if (count == -1) {
-        clock.innerHTML = "";
+        clock.style.display = "none";
+        span.innerHTML = "";
+
         clearInterval(timer);
       } else {
-        clock.innerHTML = count;
+        span.innerHTML = `${count} 초 후 시작`;
       }
     }, 1000);
   } else {
@@ -125,6 +134,7 @@ async function predict() {
     labelContainer.childNodes[i].innerHTML = `${className} : ${probability}`; // 예측값을 화면에 표시
     countContainer.innerHTML = `카운트 : ${count}`; // 카운트를 화면에 표시
 
+    // 시작 버튼을 누르면 횟수 체크
     if (startFlag) {
       // 런지, 스탠드를 판단
       if (lunge > 0.85 && lastAction == "stand") {
@@ -133,12 +143,11 @@ async function predict() {
         lastAction = "stand";
 
         count++; // 카운트 증가
+        updateProgress(); // 진행도 업데이트
 
         logContainer.innerHTML += `
-              <p class="log">
-                ${count}회 - ${prediction[0].className} : ${prediction[0].probability.toFixed(
-          15
-        )} | ${prediction[1].className} : ${prediction[1].probability.toFixed(15)}
+              <p>
+                ${count}회 - ${prediction[0].className} : ${prediction[0].probability.toFixed(15)} | ${prediction[1].className} : ${prediction[1].probability.toFixed(15)}
               </p>
             `;
 
@@ -162,28 +171,43 @@ function drawPose(pose) {
   }
 }
 
-// https://www.tensorflow.org/lite/examples/pose_estimation/overview?hl=ko
+// 진행도
+const circle = document.querySelector(".progress-ring__circle");
+const radius = circle.r.baseVal.value;
+const circumference = 2 * Math.PI * radius;
+const progressText = document.querySelector("#progress");
+const currentCountText = document.querySelector("#current-count");
+const goalCountText = document.querySelector("#goal-count");
+
+circle.style.strokeDasharray = `${circumference} ${circumference}`;
+circle.style.strokeDashoffset = circumference;
+
+function setProgress(percent) {
+  const offset = circumference - (percent / 100) * circumference;
+  circle.style.strokeDashoffset = offset;
+}
+
+let progress = 0; // 진행도
+const goalCount = 20; // 목표 카운트
+const goalTime = 120; // 목표 시간 (초)
+
+updateProgress();
+function updateProgress() {
+  progress = parseInt((count / goalCount) * 100);
+
+  count === 0 ? setProgress(100) : setProgress(progress);
+
+  progressText.textContent = `${progress}%`;
+  currentCountText.textContent = `${count} 개`;
+  goalCountText.textContent = `${goalCount} 개`;
+}
+
 // ID	파트
-// 0	코
-// 1	왼쪽 눈
-// 2	오른쪽 눈
-// 3	왼쪽 귀
-// 4	오른쪽 귀
-// 5	왼쪽 어깨
-// 6	오른쪽 어깨
-// 7	왼쪽 팔꿈치
-// 8	오른쪽 팔꿈치
-// 9	왼쪽 손목
-// 10	오른쪽 손목
-// 11	왼쪽 골반 부위
-// 12	오른쪽 골반 부위
-// 13	왼쪽 무릎
-// 14	오른쪽 무릎
-// 15	왼쪽 발목
-// 16	오른쪽 발목
+// https://www.tensorflow.org/lite/examples/pose_estimation/overview?hl=ko
 
 // 카메라 해상도 최대값 구하기
 // https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia
+//
 // navigator.mediaDevices
 //   .getUserMedia({ video: true })
 //   .then(function (stream) {
