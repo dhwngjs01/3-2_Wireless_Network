@@ -51,6 +51,7 @@ function checkCamera() {
 function start() {
   const clock = document.getElementById("clock");
   const span = document.querySelector("#clock span");
+
   if (haveCamera) {
     let count = 3;
 
@@ -171,25 +172,42 @@ function drawPose(pose) {
   }
 }
 
-// 진행도
+// 프로그레스 링 (https://css-tricks.com/building-progress-ring-quickly/)
 const circle = document.querySelector(".progress-ring__circle");
-const radius = circle.r.baseVal.value;
-const circumference = 2 * Math.PI * radius;
 const progressText = document.querySelector("#progress");
 const currentCountText = document.querySelector("#current-count");
 const goalCountText = document.querySelector("#goal-count");
 
-circle.style.strokeDasharray = `${circumference} ${circumference}`;
-circle.style.strokeDashoffset = circumference;
+const radius = circle.r.baseVal.value; // 반지름
+const circumference = 2 * Math.PI * radius; // 원의 둘레
+
+circle.style.strokeDasharray = `${circumference} ${circumference}`; // dasharray를 원의 둘레로 설정
+circle.style.strokeDashoffset = circumference; // 원의 둘레만큼 dash를 이동시켜서 안보이게 함
+
+let progress = 0; // 진행도
+let goalCount = 20; // 목표 카운트
+let goalTime = 120; // 목표 시간 (초)
+
+const param = new URLSearchParams(window.location.search); // URL 파라미터
+
+// URL 파라미터에 goalCount 와 goalTime 이 있으면 가져옴
+if (param.has("goalCount") && param.has("goalTime")) {
+  goalCount = Number(param.get("goalCount"));
+  goalTime = Number(param.get("goalTime"));
+
+  // URL 파라미터에 goalCount 와 goalTime 이 없으면 index.html 로 이동
+  if (isNaN(goalCount) || isNaN(goalTime)) {
+    alert("잘못된 접근입니다.");
+    window.location.href = "index.html";
+  }
+
+  goalCountText.textContent = `${goalCount} 개`; // 목표 카운트를 화면에 표시
+}
 
 function setProgress(percent) {
   const offset = circumference - (percent / 100) * circumference;
   circle.style.strokeDashoffset = offset;
 }
-
-let progress = 0; // 진행도
-const goalCount = 20; // 목표 카운트
-const goalTime = 120; // 목표 시간 (초)
 
 updateProgress();
 function updateProgress() {
