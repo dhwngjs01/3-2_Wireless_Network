@@ -42,7 +42,7 @@
       // page 파라미터를 가져온다.
       // 1. 푸쉬업
       // 2. 스쿼트
-      // 3. 버피
+      // 3. 레이즈
       // 4. 런지
       const chooseExercise = parseInt(param.get("page"));
       let exercise = "";
@@ -88,7 +88,7 @@
             exercise = "squat";
             break;
           case 3:
-            exercise = "burpee";
+            exercise = "raise";
             break;
           case 4:
             exercise = "lunge";
@@ -100,7 +100,7 @@
         }
 
         // 페이지 이동
-        window.location.href = `page/${exercise}.html?goalCount=${goalCountValue}&goalTime=${goalTime}`;
+        window.location.href = `page/${exercise}/index.html?goalCount=${goalCountValue}&goalTime=${goalTime}`;
       });
     </script>
   </body>

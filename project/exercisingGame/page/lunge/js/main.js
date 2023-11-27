@@ -24,8 +24,8 @@ let remainTime = 0; // 운동 종료 시간
 
 // 파라미터로 목표 횟수와 제한 시간을 받아옴
 const param = new URLSearchParams(window.location.search); // URL 파라미터
-const goalCount = param.get("goalCount") ? param.get("goalCount") : 20; // 목표 횟수
-const goalTime = param.get("goalTime") ? param.get("goalTime") : 120; // 제한 시간
+const goalCount = param.get("goalCount") ? Number(param.get("goalCount")) : 20; // 목표 횟수
+const goalTime = param.get("goalTime") ? Number(param.get("goalTime")) : 120; // 제한 시간
 
 // DOM 요소
 const labelContainer = document.getElementById("label-container");
@@ -122,13 +122,13 @@ async function predict() {
   const stand = prediction[1].probability.toFixed(2); // 스탠드
   // const nothing = prediction[2].probability.toFixed(2); // 런지 또는 스탠드로 고정되는 버그를 막기위해 넣어둠
 
-  for (let i = 0; i < maxPredictions; i++) {
-    className = prediction[i].className; // 클래스 이름
-    probability = prediction[i].probability.toFixed(2); // 예측값
+  // for (let i = 0; i < maxPredictions; i++) {
+  //   className = prediction[i].className; // 클래스 이름
+  //   probability = prediction[i].probability.toFixed(2); // 예측값
 
-    labelContainer.childNodes[i].innerHTML = `${className} : ${probability}`; // 예측값을 화면에 표시
-    countContainer.innerHTML = `카운트 : ${count}`; // 카운트를 화면에 표시
-  }
+  //   labelContainer.childNodes[i].innerHTML = `${className} : ${probability}`; // 예측값을 화면에 표시
+  //   countContainer.innerHTML = `카운트 : ${count}`; // 카운트를 화면에 표시
+  // }
 
   // 시작 버튼을 누르면 횟수 체크 시작
   if (exerciseStartFlag) {
