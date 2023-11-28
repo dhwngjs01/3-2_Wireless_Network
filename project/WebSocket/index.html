@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WebSocket Video Streaming</title>
+  </head>
+  <body>
+    <video id="webcam" width="640" height="480" autoplay></video>
+    <img class="videoFrame" width="640" height="480" />
+
+    <script>
+      const videoElement = document.getElementById("webcam");
+      const videoFrame = document.querySelector(".videoFrame");
+      const ws = new WebSocket("ws://localhost:3000");
+
+      // 웹캠에 접근하여 비디오 스트림을 받아오는 함수
+      async function getWebcamStream() {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+          videoElement.srcObject = stream;
+
+          // 비디오 프레임을 서버로 전송
+          setInterval(() => {
+            const canvas = document.createElement("canvas");
+            canvas.width = videoElement.width;
+            canvas.height = videoElement.height;
+            const context = canvas.getContext("2d");
+            context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+            const imageData = canvas.toDataURL("image/jpeg");
+
+            ws.send(imageData);
+          }, 1000 / 1); // 30 frames per second
+        } catch (error) {
+          console.error("Error accessing webcam:", error);
+        }
+      }
+
+      ws.onmessage = (event) => {
+        const imageDataBase64 = event.data;
+
+        // 이미지 데이터를 화면에 표시
+        videoFrame.src = imageDataBase64;
+      };
+
+      window.onload = getWebcamStream;
+    </script>
+  </body>
+</html>
