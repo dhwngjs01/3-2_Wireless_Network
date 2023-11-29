@@ -1,3 +1,4 @@
+import socket
 import asyncio
 import base64
 import cv2
@@ -9,7 +10,6 @@ import json
 
 import websockets
 from websockets.exceptions import ConnectionClosed
-
 warnings.simplefilter("ignore", DeprecationWarning)
 
 mp_pose = mp.solutions.pose
@@ -93,9 +93,12 @@ async def sendClientsList(websocket):
 ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
 ssl_context.load_cert_chain('./cert/public.pem', keyfile='./cert/private.pem')
 
+my_ip_address = socket.gethostbyname(socket.gethostname())
+port = 3000
+
 # 서버 생성
 start_server = websockets.serve(
-    handle, "172.30.1.100", 3000, ssl=ssl_context
+    handle, my_ip_address, port, ssl=ssl_context
 )
 
 print('WebSocket Secure Server Listening on port 3000...')

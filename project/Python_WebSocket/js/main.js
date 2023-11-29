@@ -2,7 +2,7 @@ var startFlag = false;
 
 const w = 320;
 const h = 240;
-const url = "wss://dhwngjs01.ddns.net:3000";
+const url = "wss://dhwngjs01.iptime.org:3000"; // WebSocket 서버 주소
 const ws = new WebSocket(url);
 
 const video = document.getElementById("videoInput");
