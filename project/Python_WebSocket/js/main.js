@@ -2,7 +2,7 @@ var startFlag = false;
 
 const w = 320;
 const h = 240;
-const url = "wss://dhwngjs01.iptime.org:3000"; // WebSocket 서버 주소
+const url = "wss://dhwngjs01.ddns.net:3000"; // WebSocket 서버 주소
 const ws = new WebSocket(url);
 
 const video = document.getElementById("videoInput");
@@ -28,7 +28,7 @@ window.onload = function () {
 
 // 서버 연결 시 실행
 ws.onopen = function () {
-  setCurrentStatus(ws.readyState);
+  showCurrentStatus(ws.readyState);
 };
 
 // 서버에서 메시지 수신 시 실행
@@ -63,7 +63,7 @@ function stream() {
   function sendImage() {
     // 서버 연결 상태 확인 (연결이 끊어지면 전송 중지)
     if (ws.readyState != 1) {
-      setCurrentStatus(ws.readyState);
+      showCurrentStatus(ws.readyState);
       startFlag = false;
       clearInterval(streamInterval);
       return;
@@ -92,7 +92,8 @@ function getUserMedia() {
   }
 }
 
-function setCurrentStatus(readyState) {
+// 웹 소켓 연결 상태 표시
+function showCurrentStatus(readyState) {
   if (readyState == 1) {
     currentStatus.innerHTML = "웹 소켓 서버에 연결되었습니다. (정상 연결 중)";
   } else if (readyState == 2) {
@@ -104,6 +105,7 @@ function setCurrentStatus(readyState) {
   }
 }
 
+// 서버에서 받은 클라이언트 리스트 출력
 function showClientsList(clients) {
   clientList.innerHTML = "";
 
