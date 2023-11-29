@@ -5,8 +5,8 @@
 
 // Teachable Machine 모델 관련 변수
 // const URL = "model/"; // 오프라인 모델 경로
-// const URL = "https://teachablemachine.withgoogle.com/models/XZoOor9uB/"; // 런지 온라인 모델
-const URL = "https://teachablemachine.withgoogle.com/models/aC0ukQBIm/"; // 왼팔 들어 내려 온라인 모델
+const URL = "https://teachablemachine.withgoogle.com/models/XZoOor9uB/"; // 런지 온라인 모델
+// const URL = "https://teachablemachine.withgoogle.com/models/aC0ukQBIm/"; // 왼팔 들어 내려 온라인 모델
 let model, webcam, ctx, maxPredictions; // 모델, 웹캠, 캔버스, 예측값 최대값
 
 // 운동 관련 변수
@@ -20,12 +20,13 @@ let timerStartFlag = false; // 타이머 시작 여부 (타이머가 시작되�
 
 // 프로그레스 링에서 사용할 변수
 let progress = 0; // 진행도
-let remainTime = 0; // 운동 종료 시간
 
 // 파라미터로 목표 횟수와 제한 시간을 받아옴
 const param = new URLSearchParams(window.location.search); // URL 파라미터
 const goalCount = param.get("goalCount") ? param.get("goalCount") : 20; // 목표 횟수
 const goalTime = param.get("goalTime") ? param.get("goalTime") : 120; // 제한 시간
+
+let remainTime = goalTime; // 운동 종료 시간 처음에 보이게만 초기화 (나중에 1씩 닳아질거임)
 
 // DOM 요소
 const labelContainer = document.getElementById("label-container");
