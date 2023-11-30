@@ -1,7 +1,7 @@
 var startFlag = false;
 
-const w = 320;
-const h = 240;
+const w = 640;
+const h = 480;
 const url = "wss://dhwngjs01.ddns.net:3000"; // WebSocket 서버 주소
 const ws = new WebSocket(url);
 
@@ -19,6 +19,7 @@ canvas.height = h;
 const ctx = canvas.getContext("2d");
 
 var streamInterval;
+var score = 0;
 
 // 로드 완료 시 실행
 window.onload = function () {
@@ -36,6 +37,9 @@ ws.onmessage = function (msg) {
   data = JSON.parse(msg.data);
 
   if (data.clients) showClientsList(data.clients);
+
+  if (data.score) score = data.score;
+  document.getElementById("score").innerHTML = score;
 
   if (startFlag) {
     img.src = data.image;

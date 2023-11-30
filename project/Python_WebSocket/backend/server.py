@@ -1,3 +1,4 @@
+import math
 import socket
 import asyncio
 import base64
@@ -12,16 +13,23 @@ import websockets
 from websockets.exceptions import ConnectionClosed
 warnings.simplefilter("ignore", DeprecationWarning)
 
+from model.squat import squat_detect
+
 mp_pose = mp.solutions.pose
 mp_drawing = mp.solutions.drawing_utils
 
+status = "stand"
 
 # 클라이언트가 연결했을 때 호출되는 함수
 async def handle(websocket, path):
+    global status
+
     pose_tracker = mp_pose.Pose() # 포즈 추적 모델 로드
 
     await sendClientsList(websocket)
     
+    score = 0
+
     # 클라이언트로부터 메시지를 계속 받음
     try:
         async for msg in websocket:
@@ -33,11 +41,15 @@ async def handle(websocket, path):
 
             # 포즈 추적을 위해 이미지를 그레이스케일로 변환
             image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+
+            # 포즈 추적 수행
             results = pose_tracker.process(image_rgb)
 
-            # 포즈 추적 결과를 그림
-            if results.pose_landmarks:
-                mp_drawing.draw_landmarks(image, results.pose_landmarks, mp_pose.POSE_CONNECTIONS)
+            # 스쿼트 판단
+            score, status = squat_detect(results, score, status)
+
+
+            mp_drawing.draw_landmarks(image, results.pose_landmarks, mp_pose.POSE_CONNECTIONS)
 
             # 클라이언트로 이미지 전송
             _, buffer = cv2.imencode('.jpg', image)
@@ -47,7 +59,8 @@ async def handle(websocket, path):
             # 클라이언트로 전송할 데이터 생성 (JSON 형식으로 해야 여러 종류의 데이터를 한번에 전송 가능)
             data = {
                 "image" : image_encoded,
-                "clients": clients
+                "clients": clients,
+                "score" : score,
             }
 
             data = json.dumps(data)
@@ -61,7 +74,6 @@ async def handle(websocket, path):
     except ConnectionClosed as e:
          # 연결이 종료되었을 때
         print(f"Connection closed with code {e.code}, reason: {e.reason}")
-
 
 
 # 클라이언트 전체 목록
