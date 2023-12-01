@@ -35,16 +35,16 @@
       <button type="button" onclick="location.href='/index.html'">메인페이지로</button>
 
       <div class="row">
-        <div class="col">
+        <div class="col-6">
           <canvas id="video-output" style="transform: scaleX(-1)"></canvas>
-          <video id="video-input" style="display: none"></video>
+          <video id="video-input" style="display: none" controls autoplay muted playsinline></video>
         </div>
 
-        <div class="col">
+        <div class="col-6">
           <img id="received-image" style="min-height: 300px" src="/images/wait_received_image.jpg" />
         </div>
 
-        <div class="col">
+        <div class="col-6">
           <svg class="progress-ring" width="200" height="200">
             <circle class="progress-ring__circle" stroke="blue" stroke-width="8" stroke-linecap="round" fill="transparent" r="96" cx="100" cy="100" />
             <text id="progress" x="50%" y="40%" text-anchor="middle" dy=".3em" font-size="2em" font-weight="bold"></text>
@@ -53,6 +53,10 @@
             <text id="goal-count" x="80%" y="60%" text-anchor="end" dy=".3em" font-size="1em" fill="red" font-weight="bold"></text>
             <text id="alarm" x="51%" y="75%" text-anchor="middle" dy="0.3em" font-size="1em" fill="red" font-weight="bold"></text>
           </svg>
+        </div>
+
+        <div class="col-6">
+          <ul id="clients" style="list-style: none; line-height: 2"></ul>
         </div>
       </div>
     </div>

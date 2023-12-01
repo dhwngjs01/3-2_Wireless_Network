@@ -1,4 +1,4 @@
-const url = "wss://dhwngjs01.ddns.net:3000"; // WebSocket 서버 주소
+const url = "wss://dhwngjs01.iptime.org:3000"; // WebSocket 서버 주소
 const ws = new WebSocket(url);
 
 // DOM 요소
@@ -86,12 +86,30 @@ ws.onmessage = function (msg) {
   if (data.score != undefined) score = data.score;
   updateProgress(); // 프로그레스 링 업데이트 (부하 살펴봐야됨)
 
-  // -----------------------
+  // ----------------------- 나중에 지워야 됨
   // 테스트용 포즈 추적 이미지 출력
   if (exerciseStartFlag) {
     img.src = data.image;
   }
-  // -----------------------
+  // ----------------------- 나중에 지워야 됨
+
+  // ----------------------- 나중에 지워야 됨
+  // 클라이언트 접속 목록을 화면에 표시
+  if (data.clients != undefined) {
+    const clients = document.querySelector("#clients");
+    clients.innerHTML = "";
+    for (let i = 0; i < data.clients.length; i++) {
+      const li = document.createElement("li");
+
+      ip = data.clients[i].split("|")[0];
+      port = data.clients[i].split("|")[1];
+      date = data.clients[i].split("|")[2];
+
+      li.innerHTML = `${ip}:${port} (${date})`;
+      clients.appendChild(li);
+    }
+  }
+  // ----------------------- 나중에 지워야 됨
 };
 
 // 서버로 데이터 전송
@@ -155,7 +173,7 @@ function startTimer() {
 
 function stream() {
   // 이미지 전송 간격 설정 (60이 적당함, 라즈베리파이에서 느리게 작동하면 값 조절 해야할듯)
-  streamInterval = setInterval(sendImage, 60);
+  streamInterval = setInterval(sendImage, 30);
 
   function sendImage() {
     // 목표 횟수를 달성하거나 제한 시간이 지나면 루프 종료
@@ -180,7 +198,7 @@ function processImage() {
 // 웹 캠 연결
 function getUserMedia() {
   const constraints = { audio: false, video: true }; // 오디오, 비디오 사용 여부
-  navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia; // 크로스 브라우징
+  navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia; // 크로스 브라우징
 
   navigator.getUserMedia(constraints, successCallback, errorCallback); // 웹 캠 연결
 
