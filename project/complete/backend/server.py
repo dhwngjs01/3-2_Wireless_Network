@@ -6,6 +6,7 @@ import numpy as np
 import mediapipe as mp
 import ssl
 import json
+import datetime
 
 import websockets
 from websockets.exceptions import ConnectionClosed
@@ -25,8 +26,26 @@ mp_drawing = mp.solutions.drawing_utils
 # 클라이언트 전체 목록
 clients = []
 
+# 클라이언트 목록을 클라이언트에게 전송하는 함수
+async def sendClientsList(websocket):
+    global clients
+    
+    ip = str(websocket.remote_address[0]) # 클라이언트의 IP 주소
+    port = str(websocket.remote_address[1]) # 클라이언트의 포트 번호
+    date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") # 연결 시간
+
+    print(f"Client connected from {ip}:{port}") # 클라이언트가 연결되었음을 출력
+
+    # 클라이언트 목록에 추가
+    clients.insert(0, ip+"|"+port+"|"+date)
+    
+    # 클라이언트 목록 전송
+    await websocket.send(json.dumps({ "clients" : clients }))
+
 # 클라이언트가 연결했을 때 호출되는 함수
 async def handle(websocket, path):
+    await sendClientsList(websocket)
+
     pose_tracker = mp_pose.Pose() # 포즈 추적 모델 로드
     
     status = "stand"
@@ -82,7 +101,7 @@ async def handle(websocket, path):
             # 클라이언트로 전송할 데이터 생성 (JSON 형식으로 해야 여러 종류의 데이터를 한번에 전송 가능)
             data = {
                 "image" : image_encoded,
-                # "clients": clients,
+                "clients": clients,
                 "score" : score,
             }
 
