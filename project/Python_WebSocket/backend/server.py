@@ -15,7 +15,9 @@ import warnings
 warnings.simplefilter("ignore", DeprecationWarning)
 
 from model.squat import squat_detect
+from model.pushup import pushup_detect
 from model.side_lateral_raise import raise_detect
+from model.lunge import lunge_detect
 
 mp_pose = mp.solutions.pose
 mp_drawing = mp.solutions.drawing_utils
@@ -81,16 +83,16 @@ async def handle(websocket, path):
 
             if exercise == "squat":
                 # 스쿼트 판단
-                score, status = squat_detect(results, score, status)
+                score, status = squat_detect(results, score, status, image)
             elif exercise == "pushup":
                 # 푸쉬업 판단
-                pass
+                score, status, image = pushup_detect(results, score, status, image)
             elif exercise == "raise":
                 # 레이즈 판단
                 score, status, image = raise_detect(results, score, status, image)
             elif exercise == "lunge":
                 # 런지 판단
-                pass
+                score, status, image = lunge_detect(results, score, status, image)
 
 
 

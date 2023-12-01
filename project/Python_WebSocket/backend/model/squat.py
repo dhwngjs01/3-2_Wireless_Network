@@ -14,7 +14,7 @@ SQUAT_KNEE_ANGLE_THRESHOLD = 130  # 무릎 각도 임계값
 SQUAT_HIP_DISTANCE_THRESHOLD = 0.2  # 엉덩이 간격 임계값
 SQUAT_KNEE_DISTANCE_THRESHOLD = 0.1  # 무릎 간격 임계값
 
-def squat_detect(results, score, status):
+def squat_detect(results, score, status, image):
     # 포즈 추적 결과를 그림
     if results.pose_landmarks:
         right_knee = results.pose_landmarks.landmark[RIGHT_KNEE]   # 오른쪽 무릎
@@ -42,6 +42,12 @@ def squat_detect(results, score, status):
         if right_knee_angle > 180 and left_knee_angle > 180:
             right_knee_angle = 360 - right_knee_angle
             left_knee_angle = 360 - left_knee_angle
+
+        cv2.putText(image, f"Right knee angle: {right_knee_angle:.2f}", (10, 50), FONT, 1, (0, 255, 0), 2, cv2.LINE_AA)
+        cv2.putText(image, f"Left knee angle: {left_knee_angle:.2f}", (10, 100), FONT, 1, (0, 255, 0), 2, cv2.LINE_AA)
+        cv2.putText(image, f"Hip distance: {hip_distance:.2f}", (10, 150), FONT, 1, (0, 255, 0), 2, cv2.LINE_AA)
+        cv2.putText(image, f"Knee distance: {knee_distance:.2f}", (10, 200), FONT, 1, (0, 255, 0), 2, cv2.LINE_AA)
+        cv2.putText(image, f"Score: {score}", (10, 250), FONT, 1, (0, 255, 0), 2, cv2.LINE_AA)
 
         # 스쿼트 판단
         # 양쪽 무릎을 130도까지 굽히고 (서있는게 180도로 인식)
