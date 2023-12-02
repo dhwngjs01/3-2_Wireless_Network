@@ -34,10 +34,14 @@ async def sendClientsList(websocket):
     port = str(websocket.remote_address[1]) # 클라이언트의 포트 번호
     date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") # 연결 시간
 
-    print(f"Client connected from {ip}:{port}") # 클라이언트가 연결되었음을 출력
+    print(f"Client connected from {ip}:{port} ({date})") # 클라이언트가 연결되었음을 출력
 
     # 클라이언트 목록에 추가
     clients.insert(0, ip+"|"+port+"|"+date)
+
+    if len(clients) > 10:
+        # 클라이언트 목록이 10개를 초과하면 가장 오래된 클라이언트를 삭제
+        clients.pop()
     
     # 클라이언트 목록 전송
     await websocket.send(json.dumps({ "clients" : clients }))
